@@ -1,35 +1,41 @@
 import os
 from dotenv import load_dotenv
 from web3 import Web3
-from openai import OpenAI
+import openai
 
-# Load API keys from secrets.env
+# Load secrets
 load_dotenv("secrets.env")
+
+# Get keys from secrets.env
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 INFURA_URL = os.getenv("INFURA_URL")
 
-# Connect to Ethereum via Infura
+# Setup clients
+openai.api_key = OPENAI_API_KEY
 web3 = Web3(Web3.HTTPProvider(INFURA_URL))
+
+# Test Web3 connection
 if web3.is_connected():
-    print("✅ Connected to Ethereum network")
+    print("Connected to Ethereum via Infura!")
 else:
-    print("❌ Failed to connect to Ethereum")
-    exit()
+    print("Failed to connect to Infura.")
 
-# Connect to OpenAI
-client = OpenAI(api_key=OPENAI_API_KEY)
+# Example OpenAI request
+def ask_gpt(question):
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant for DAO governance."},
+            {"role": "user", "content": question}
+        ]
+    )
+    return response.choices[0].message["content"]
 
-# Example request to OpenAI
-response = client.chat.completions.create(
-    model="gpt-4o-mini",
-    messages=[
-        {"role": "system", "content": "You are an AI assistant for blockchain queries."},
-        {"role": "user", "content": "Hello, can you tell me the latest Ethereum block number?"}
-    ]
-)
-
-print("🤖 OpenAI says:", response.choices[0].message.content)
-
-# Get latest Ethereum block
-latest_block = web3.eth.block_number
-print(f"⛓ Latest Ethereum block: {latest_block}")
+# Run bot
+if __name__ == "__main__":
+    while True:
+        user_input = input("Ask DAO Bot: ")
+        if user_input.lower() in ["exit", "quit"]:
+            break
+        answer = ask_gpt(user_input)
+        print("Bot:", answer)
