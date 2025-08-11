@@ -2,32 +2,52 @@ name: AutoDAO Agent + CKZG
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 */6 * * *" # jalan tiap 6 jam
 
 jobs:
   run-autodao:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout this repo
         uses: actions/checkout@v3
+
+      - name: Clone AutoDAO-Agent
+        run: |
+          git clone https://github.com/Ethaga/AutoDAO-Agent.git AutoDAO-Agent
+          git clone https://github.com/Ethaga/auto-ckzg.git auto-ckzg
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: Install dependencies (if package.json exists)
+      - name: Install dependencies (AutoDAO-Agent)
         run: |
+          cd AutoDAO-Agent
           if [ -f package.json ]; then
+            echo "package.json found, installing dependencies..."
             npm install
           else
-            echo "package.json not found, skipping npm install"
+            echo "No package.json found, skipping install."
           fi
+          cd ..
 
-      - name: Run AutoDAO Agent + CKZG
+      - name: Install dependencies (auto-ckzg)
         run: |
-          echo "Starting AutoDAO Agent + CKZG..."
-          # ganti sesuai script kamu
-          node index.js || echo "Node script not found, skipping"
+          cd auto-ckzg
+          if [ -f package.json ]; then
+            echo "package.json found, installing dependencies..."
+            npm install
+          else
+            echo "No package.json found, skipping install."
+          fi
+          cd ..
+
+      - name: Run AutoDAO Agent
+        run: |
+          echo "Starting AutoDAO Agent..."
+          cd AutoDAO-Agent
+          if [ -f index.js ]; then
+            node index.js
+          else
+            echo "index.js not found, skipping execution."
+          fi
