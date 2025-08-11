@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+        
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -19,22 +19,25 @@ jobs:
         run: npm install
 
       - name: Run AutoDAO Agent
-        run: npm start
-
+        run: npm run start  # Pastikan ini sesuai dengan perintah untuk menjalankan AutoDAO
+  
   run-ckzg:
     runs-on: ubuntu-latest
-    needs: run-autodao
+    needs: run-autodao  # Menunggu run-autodao selesai
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+        
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: Install dependencies for CKZG
+      - name: Install dependencies
         run: npm install
+
+      - name: Run CKZG Process
+        run: npm run ckzg  # Pastikan ini sesuai dengan perintah untuk menjalankan CKZG        run: npm install
 
       - name: Run CKZG script
         env:
